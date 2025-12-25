@@ -22,6 +22,12 @@ jobs:
         with:
           node-version: 18
 
+      - name: Preparing Web Assets
+        run: |
+          mkdir www
+          mv *.html manifest.json service-worker.js css js fav fonts icons logo resources www/ || true
+          sed -i 's/"webDir": "."/"webDir": "www"/' capacitor.config.json
+
       - name: Install Dependencies
         run: npm install
 
