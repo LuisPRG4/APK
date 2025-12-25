@@ -14,8 +14,8 @@ jobs:
       - name: Checkout Source
         uses: actions/checkout@v3
 
-      - name: Unzip Source
-        run: unzip -o source.zip -d .
+      - name: Unzip Source (Universal)
+        run: 7z x source.zip -o. -y
 
       - name: Setup Node.js
         uses: actions/setup-node@v3
