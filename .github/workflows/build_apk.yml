@@ -22,15 +22,15 @@ jobs:
         with:
           node-version: 18
 
-      - name: Patch Service Worker (Fix Path)
+      - name: Prepare Assets (The Fix)
         run: |
-          sed -i "s|return '/Los_SS/';|return '';|g" service-worker.js
+          mkdir public_html
+          cp -r css js fav fonts icons logo resources *.html manifest.json service-worker.js public_html/
+          sed -i 's/"webDir": "."/"webDir": "public_html"/' capacitor.config.json
+          sed -i "s|return '/Los_SS/';|return '';|g" public_html/service-worker.js
 
-      - name: Preparing Web Assets
-        run: |
-          mkdir www
-          mv *.html manifest.json service-worker.js css js fav fonts icons logo resources www/ || true
-          sed -i 's/"webDir": "."/"webDir": "www"/' capacitor.config.json
+      - name: Verify Assets (Debug)
+        run: ls -R public_html
 
       - name: Install Dependencies
         run: npm install
@@ -48,5 +48,5 @@ jobs:
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: Los-SS-App-Debug
+          name: Los-SS-App-Final
           path: android/app/build/outputs/apk/debug/app-debug.apk
