@@ -15,7 +15,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Unzip Source
-        run: unzip source.zip -d .
+        run: unzip -o source.zip -d .
 
       - name: Setup Node.js
         uses: actions/setup-node@v3
