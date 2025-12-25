@@ -1,52 +1,49 @@
 name: Build Android APK
-
 on:
   push:
     branches:
       - main
       - master
   workflow_dispatch:
-
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Source
         uses: actions/checkout@v3
-
-      - name: Unzip Source (Universal)
-        run: 7z x source.zip -o. -y
-
+      - name: Unzip Source (Python Fix)
+        run: |
+          python3 -c "
+          import zipfile, os
+          with zipfile.ZipFile('source.zip', 'r') as z:
+              for info in z.infolist():
+                  # Corrige las barras invertidas de Windows a barras normales
+                  info.filename = info.filename.replace('\\\\', '/')
+                  z.extract(info, '.')
+          "
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: 18
-
-      - name: Prepare Assets (The Fix)
+      - name: Prepare Assets
         run: |
           mkdir public_html
+          # Ahora sí funcionará porque las carpetas existen
           cp -r css js fav fonts icons logo resources *.html manifest.json service-worker.js public_html/
           sed -i 's/"webDir": "."/"webDir": "public_html"/' capacitor.config.json
           sed -i "s|return '/Los_SS/';|return '';|g" public_html/service-worker.js
-
-      - name: Verify Assets (Debug)
-        run: ls -R public_html
-
       - name: Install Dependencies
         run: npm install
-
       - name: Initialize Capacitor Android
         run: |
           npx cap add android
           npx cap sync
-
-      - name: Build Debug APK
+      - name: Build Full App
         run: |
           cd android
           ./gradlew assembleDebug
-
-      - name: Upload APK
+      - name: Upload Full APK
         uses: actions/upload-artifact@v4
         with:
-          name: Los-SS-App-Final
+          name: Los-SS-App-Completa
           path: android/app/build/outputs/apk/debug/app-debug.apk
